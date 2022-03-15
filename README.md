@@ -10,8 +10,7 @@ output of the command.
 ### Example
 ```
 $ echo "shtpl is a simple program: it's only {{wc -l shtpl.c | cut -d\  -f1}} lines long!" | shtpl
-shtpl is a simple program: it's only 78
- lines long!
+shtpl is a simple program: it's only 101 lines long!
 ```
 
 ## Bugs
