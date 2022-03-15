@@ -46,8 +46,8 @@ main(void)
 				dotemplate(buf);
 				blank(buf, MAX_COMMANDSIZE);
 				buf_pos = 0;
-			}
-			break;
+				break;
+			} // FALLTHROUGH
 		default:
 			if(state == IN_T){
 				addc(buf, c, buf_pos++);
@@ -69,12 +69,17 @@ main(void)
 void
 dotemplate(char *command)
 {
-	char c;
+	char c1, c2;
 	FILE *pipe;
 
 	pipe = popen(command, "r");
-	while((c = getc(pipe)) != EOF)
-		printf("%c", c);
+	c1 = getc(pipe);
+	while((c2 = getc(pipe)) != EOF){
+		printf("%c", c1);
+		c1 = c2;
+	}
+	if(c1 != '\n')
+		printf("%c", c1);
 }
 
 void
