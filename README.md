@@ -15,5 +15,5 @@ shtpl is a simple program: it's only 78
 ```
 
 ## Bugs
-* Does not trim last newline in the output
+* Does not trim last newline in the output (Solved in 204169c)
 * Probably sucks
