@@ -32,11 +32,14 @@ main(void)
 				state = BEGIN_T;
 			}else if(state == BEGIN_T){
 				state = IN_T;
+			}else if(state == IN_T){
+				addc(buf, c, buf_pos++);
 			}
 			break;
 		case '}':
 			if(state == IN_T){
 				state = END_T;
+				break;
 			}else if(state == END_T){
 				state = TEXT;
 				addc(buf, '\0', buf_pos);
@@ -48,6 +51,13 @@ main(void)
 		default:
 			if(state == IN_T){
 				addc(buf, c, buf_pos++);
+			}else if(state == BEGIN_T){
+				printf("{%c", c);
+				state = TEXT;
+			}else if(state == END_T){
+				addc(buf, '}', buf_pos++);
+				addc(buf, c, buf_pos++);
+				state = IN_T;
 			}else{
 				printf("%c", c);
 			}
