@@ -80,6 +80,7 @@ dotemplate(char *command)
 	}
 	if(c1 != '\n')
 		printf("%c", c1);
+	pclose(pipe);
 }
 
 void
