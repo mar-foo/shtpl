@@ -26,43 +26,44 @@ main(void)
 	int buf_pos = 0;
 
 	while((c = getchar()) != EOF){
-		switch(c){
-		case '{':
-			if(state == TEXT){
+		switch(state){
+		case TEXT:
+			if(c == '{'){
 				state = BEGIN_T;
-			}else if(state == BEGIN_T){
-				state = IN_T;
-			}else if(state == IN_T){
-				addc(buf, c, buf_pos++);
+			}else{
+				printf("%c", c);
 			}
 			break;
-		case '}':
-			if(state == IN_T){
-				state = END_T;
-				break;
-			}else if(state == END_T){
+		case BEGIN_T:
+			if(c == '{'){
+				state = IN_T;
+			}else{
+				state = TEXT;
+				printf("{%c", c);
+			}
+			break;
+		case END_T:
+			if(c == '}'){
 				state = TEXT;
 				addc(buf, '\0', buf_pos);
 				dotemplate(buf);
 				blank(buf, MAX_COMMANDSIZE);
 				buf_pos = 0;
-				break;
-			} // FALLTHROUGH
-		default:
-			if(state == IN_T){
-				addc(buf, c, buf_pos++);
-			}else if(state == BEGIN_T){
-				printf("{%c", c);
-				state = TEXT;
-			}else if(state == END_T){
+			}else{
+				state = IN_T;
 				addc(buf, '}', buf_pos++);
 				addc(buf, c, buf_pos++);
-				state = IN_T;
+			}
+			break;
+		case IN_T:
+			if(c == '}'){
+				state = END_T;
 			}else{
-				printf("%c", c);
+				addc(buf, c, buf_pos++);
 			}
 		}
 	}
+
 	return 0;
 }
 
