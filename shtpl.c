@@ -7,6 +7,7 @@
 void addc(char*, char, int);
 void blank(char*, int);
 void dotemplate(char*);
+void shtpl(FILE*);
 
 enum states {
 	TEXT = 0,
@@ -18,49 +19,18 @@ enum states {
 int
 main(int argc, char **argv)
 {
-	char buf[MAX_COMMANDSIZE], c;
-	int state;
-	state = TEXT;
-
-	memset(buf, 0, MAX_COMMANDSIZE * sizeof(char));
-	int buf_pos = 0;
-
-	while((c = getchar()) != EOF){
-		switch(state){
-		case TEXT:
-			if(c == '{'){
-				state = BEGIN_T;
-			}else{
-				printf("%c", c);
+	FILE *f;
+	if(argc == 1){
+		shtpl(stdin);
+	}else{
+		for(int i = 1; i < argc; i++){
+			f = fopen(argv[i], "r");
+			if(f == NULL){
+				fprintf(stderr, "Error opening %s\n", argv[i]);
+				continue;
 			}
-			break;
-		case BEGIN_T:
-			if(c == '{'){
-				state = IN_T;
-			}else{
-				state = TEXT;
-				printf("{%c", c);
-			}
-			break;
-		case END_T:
-			if(c == '}'){
-				state = TEXT;
-				addc(buf, '\0', buf_pos);
-				dotemplate(buf);
-				blank(buf, MAX_COMMANDSIZE);
-				buf_pos = 0;
-			}else{
-				state = IN_T;
-				addc(buf, '}', buf_pos++);
-				addc(buf, c, buf_pos++);
-			}
-			break;
-		case IN_T:
-			if(c == '}'){
-				state = END_T;
-			}else{
-				addc(buf, c, buf_pos++);
-			}
+			shtpl(f);
+			fclose(f);
 		}
 	}
 
@@ -100,4 +70,54 @@ dotemplate(char *command)
 	if(c1 != '\n')
 		printf("%c", c1);
 	pclose(pipe);
+}
+
+void
+shtpl(FILE *f)
+{
+	char buf[MAX_COMMANDSIZE], c;
+	int state;
+	state = TEXT;
+
+	memset(buf, 0, MAX_COMMANDSIZE * sizeof(char));
+	int buf_pos = 0;
+
+	while((c = getc(f)) != EOF){
+		switch(state){
+		case TEXT:
+			if(c == '{'){
+				state = BEGIN_T;
+			}else{
+				printf("%c", c);
+			}
+			break;
+		case BEGIN_T:
+			if(c == '{'){
+				state = IN_T;
+			}else{
+				state = TEXT;
+				printf("{%c", c);
+			}
+			break;
+		case END_T:
+			if(c == '}'){
+				state = TEXT;
+				addc(buf, '\0', buf_pos);
+				dotemplate(buf);
+				blank(buf, MAX_COMMANDSIZE);
+				buf_pos = 0;
+			}else{
+				state = IN_T;
+				addc(buf, '}', buf_pos++);
+				addc(buf, c, buf_pos++);
+			}
+			break;
+		case IN_T:
+			if(c == '}'){
+				state = END_T;
+			}else{
+				addc(buf, c, buf_pos++);
+			}
+		}
+	}
 }
