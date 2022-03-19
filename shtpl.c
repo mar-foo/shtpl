@@ -5,8 +5,8 @@
 #define MAX_COMMANDSIZE 4096
 
 void addc(char*, char, int);
-void dotemplate(char*);
 void blank(char*, int);
+void dotemplate(char*);
 
 enum states {
 	TEXT = 0,
@@ -16,7 +16,7 @@ enum states {
 };
 
 int
-main(void)
+main(int argc, char **argv)
 {
 	char buf[MAX_COMMANDSIZE], c;
 	int state;
@@ -68,6 +68,24 @@ main(void)
 }
 
 void
+addc(char *buf, char c, int pos)
+{
+	if(pos + 2 >= MAX_COMMANDSIZE){
+		fprintf(stderr, "Command too long %s\n", buf);
+		exit(1);
+	}
+
+	buf[pos] = c;
+}
+
+void
+blank(char *buf, int size)
+{
+	for(int i = 0; i < size; i++)
+		buf[i] = '\0';
+}
+
+void
 dotemplate(char *command)
 {
 	char c1, c2;
@@ -82,22 +100,4 @@ dotemplate(char *command)
 	if(c1 != '\n')
 		printf("%c", c1);
 	pclose(pipe);
-}
-
-void
-blank(char *buf, int size)
-{
-	for(int i = 0; i < size; i++)
-		buf[i] = '\0';
-}
-
-void
-addc(char *buf, char c, int pos)
-{
-	if(pos + 2 >= MAX_COMMANDSIZE){
-		fprintf(stderr, "Command too long %s\n", buf);
-		exit(1);
-	}
-
-	buf[pos] = c;
 }
